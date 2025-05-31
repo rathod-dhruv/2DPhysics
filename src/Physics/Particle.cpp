@@ -14,6 +14,12 @@ Particle::Particle(float x, float y, float mass, int radius) {
     std::cout << "Particle constructor called!" << std::endl;
 }
 
+void Particle::Integrate(float dt)
+{
+    this->velocity += this->acceleration * dt;
+    position += velocity * dt;
+}
+
 Particle::~Particle() {
     std::cout << "Particle destructor called!" << std::endl;
 }

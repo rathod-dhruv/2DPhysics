@@ -58,8 +58,7 @@ void Application::Update() {
 
     particle->acceleration = Vec2(3 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER);
 
-    particle->velocity += particle->acceleration * deltaTime;
-    particle->position += particle->velocity * deltaTime;
+    particle->Integrate(deltaTime);
 
 
     if(particle->position.x + particle->radius / 2 > Graphics::Width())

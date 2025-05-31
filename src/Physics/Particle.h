@@ -13,6 +13,7 @@ struct Particle {
 
     Particle(float x, float y, float mass);
     Particle(float x, float y, float mass, int raidus);
+    void Integrate(float dt);
 
     ~Particle();
 };
