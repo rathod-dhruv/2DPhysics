@@ -12,6 +12,8 @@ struct Particle {
     float mass;
 
     Particle(float x, float y, float mass);
+    Particle(float x, float y, float mass, int raidus);
+
     ~Particle();
 };
 

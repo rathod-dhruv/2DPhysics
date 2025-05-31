@@ -11,7 +11,7 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();
     
-    particle = new Particle(50, 100, 1.0);
+    particle = new Particle(50, 100, 1.0, 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,11 +56,36 @@ void Application::Update() {
 
     //particle->velocity = Vec2(2.0, 0.0);
 
-    //Move Objects as a function of deltaTime, basically frame rate independent movement
-    particle->velocity = Vec2 (100.0 * deltaTime, 30 * deltaTime);
+    particle->acceleration = Vec2(3 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER);
 
-    particle->position.x += particle->velocity.x;
-    particle->position.y += particle->velocity.y;
+    particle->velocity += particle->acceleration * deltaTime;
+    particle->position += particle->velocity * deltaTime;
+
+
+    if(particle->position.x + particle->radius / 2 > Graphics::Width())
+    {
+        particle->position.x =   Graphics::Width() - particle->radius / 2;
+        particle->velocity.x *= -0.9;
+    }
+    else if(particle->position.x - particle->radius/2 < 0)
+    {
+        particle->position.x =   particle->radius / 2;
+        particle->velocity.x *= -0.9;
+
+    }
+    
+    if(particle->position.y + particle->radius/2> Graphics::Height())
+    {
+        particle->position.y = Graphics::Height() - particle->radius / 2;
+        particle->velocity.y *= -0.9;
+    }
+    else if(particle->position.y - particle->radius/2 < 0)
+    {
+        particle->position.y = particle->radius / 2;
+        particle->velocity.y *= -0.9;
+    }
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +93,7 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle(particle->position.x, particle->position.y, 4, 0xFFFFFFFF);
+    Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFFFFFFF);
     Graphics::RenderFrame();
 }
 
