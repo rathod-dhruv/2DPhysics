@@ -4,20 +4,34 @@
 Particle::Particle(float x, float y, float mass) {
     this->position = Vec2(x, y);
     this->mass = mass;
+    if(mass != 0.0)
+        this->invMass = 1.0/mass;
+    else
+        this->invMass = 0.0;
     this->radius = 4;
-    std::cout << "Particle constructor called!" << std::endl;
-}
-Particle::Particle(float x, float y, float mass, int radius) {
-    this->position = Vec2(x, y);
-    this->mass = mass;
-    this->radius = radius;
     std::cout << "Particle constructor called!" << std::endl;
 }
 
 void Particle::Integrate(float dt)
 {
+    acceleration = sumForces * invMass;
+
     this->velocity += this->acceleration * dt;
+
+    //Eular Integrations
     position += velocity * dt;
+
+    ClearForces();
+}
+
+void Particle::AddForce(const Vec2& force)
+{
+    sumForces += force;
+}
+
+void Particle::ClearForces()
+{
+    sumForces = Vec2(0, 0);
 }
 
 Particle::~Particle() {

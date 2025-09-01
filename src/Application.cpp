@@ -11,7 +11,22 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();
     
-    particle = new Particle(50, 100, 1.0, 4);
+    Particle* smallBall = new Particle(50, 100, 1.0);
+    smallBall->radius = 4;
+
+    particles.push_back(smallBall);
+
+    // Particle* bigBall = new Particle(70,100, 3.0);
+    // bigBall->radius = 12;
+
+    // particles.push_back(bigBall);
+
+    liquid.x = 0;
+    liquid.y = Graphics::Height() / 2;
+    liquid.w = Graphics::Width();
+    liquid.h = Graphics::Height() / 2;
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +42,26 @@ void Application::Input() {
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     running = false;
+                if(event.key.keysym.sym == SDLK_UP)
+                    pushForce.y = -50 * PIXELS_PER_METER;
+                if(event.key.keysym.sym == SDLK_RIGHT)
+                    pushForce.x = 50 * PIXELS_PER_METER;
+                 if(event.key.keysym.sym == SDLK_DOWN)
+                    pushForce.y = 50 * PIXELS_PER_METER;
+                if(event.key.keysym.sym == SDLK_LEFT)
+                    pushForce.x = -50 * PIXELS_PER_METER;
                 break;
+            case SDL_KEYUP:
+                if(event.key.keysym.sym == SDLK_UP)
+                    pushForce.y = 0;
+                if(event.key.keysym.sym == SDLK_RIGHT)
+                    pushForce.x = 0;
+                 if(event.key.keysym.sym == SDLK_DOWN)
+                    pushForce.y = 0;
+                if(event.key.keysym.sym == SDLK_LEFT)
+                    pushForce.x = 0;
+                    break;
+            
         }
     }
 }
@@ -56,34 +90,53 @@ void Application::Update() {
 
     //particle->velocity = Vec2(2.0, 0.0);
 
-    particle->acceleration = Vec2(3 * PIXELS_PER_METER, 9.8 * PIXELS_PER_METER);
-
-    particle->Integrate(deltaTime);
-
-
-    if(particle->position.x + particle->radius / 2 > Graphics::Width())
+    //apply Wind Force
+    for(auto particle : particles)
     {
-        particle->position.x =   Graphics::Width() - particle->radius / 2;
-        particle->velocity.x *= -0.9;
+        Vec2 wind = Vec2(0.3 * PIXELS_PER_METER, 0.1 * PIXELS_PER_METER);
+        particle->AddForce(wind);
     }
-    else if(particle->position.x - particle->radius/2 < 0)
-    {
-        particle->position.x =   particle->radius / 2;
-        particle->velocity.x *= -0.9;
 
+    for(auto particle : particles)
+    {
+        Vec2 weight = Vec2(0.0, particle-> mass * 9.8 * PIXELS_PER_METER);
+        particle->AddForce(weight);
+    }
+
+    for(auto particle : particles)
+    {
+       particle->AddForce(pushForce);
     }
     
-    if(particle->position.y + particle->radius/2> Graphics::Height())
+    
+    for(auto particle : particles)
     {
-        particle->position.y = Graphics::Height() - particle->radius / 2;
-        particle->velocity.y *= -0.9;
-    }
-    else if(particle->position.y - particle->radius/2 < 0)
-    {
-        particle->position.y = particle->radius / 2;
-        particle->velocity.y *= -0.9;
-    }
+         particle->Integrate(deltaTime);
 
+        if(particle->position.x + particle->radius / 2 > Graphics::Width())
+        {
+            particle->position.x =   Graphics::Width() - particle->radius / 2;
+            particle->velocity.x *= -0.9;
+        }
+        else if(particle->position.x - particle->radius/2 < 0)
+        {
+            particle->position.x =   particle->radius / 2;
+            particle->velocity.x *= -0.9;
+
+        }
+        
+        if(particle->position.y + particle->radius/2> Graphics::Height())
+        {
+            particle->position.y = Graphics::Height() - particle->radius / 2;
+            particle->velocity.y *= -0.9;
+        }
+        else if(particle->position.y - particle->radius/2 < 0)
+        {
+            particle->position.y = particle->radius / 2;
+            particle->velocity.y *= -0.9;
+        }   
+    }
+    
 
 }
 
@@ -92,14 +145,26 @@ void Application::Update() {
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFFFFFFF);
+
+    //Draw the liquid
+    Graphics::DrawFillRect(liquid.x + liquid.w/2, liquid.y + liquid.h/2, liquid.w, liquid.h, 0xFF6E3713);
+
+    for(auto particle : particles)
+    {
+        Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFFFFFFF);
+    }
     Graphics::RenderFrame();
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destroy function to delete objects and close the window
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Destroy() {
-    delete particle;
+    for(auto particle : particles)
+    {
+        delete particle; 
+    }
     Graphics::CloseWindow();
 }
