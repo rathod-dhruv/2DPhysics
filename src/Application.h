@@ -14,13 +14,14 @@ class Application {
         // TODO : create a fluid
 
         SDL_Rect liquid;
-        
+
 
     public:
         Application() = default;
         ~Application() = default;
         bool IsRunning();
         void Setup();
+        void SpawnParticle(float x, float y, float mass, float radius);
         void Input();
         void Update();
         void Render();

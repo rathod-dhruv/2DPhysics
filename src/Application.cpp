@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Physics/Constants.h"
+#include "Physics/Force.h"
 
 bool Application::IsRunning() {
     return running;
@@ -29,6 +30,14 @@ void Application::Setup() {
 
 }
 
+
+
+void Application::SpawnParticle(float x, float y, float mass, float radius)
+{
+    Particle* spawnParticle = new Particle(x,y, mass);
+    spawnParticle->radius = radius;
+    particles.push_back(spawnParticle);
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Input processing
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,6 +48,11 @@ void Application::Input() {
             case SDL_QUIT:
                 running = false;
                 break;
+            case SDL_MOUSEBUTTONDOWN:{
+                int x, y;
+                SDL_GetMouseState(&x, &y); //Get Current mouse Position
+                SpawnParticle(x, y, 1.0f, 4.0f);
+            }
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     running = false;
@@ -66,6 +80,9 @@ void Application::Input() {
     }
 }
 
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Update function (called several times per second to update objects)
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,29 +107,42 @@ void Application::Update() {
 
     //particle->velocity = Vec2(2.0, 0.0);
 
-    //apply Wind Force
+    //apply forces to the particles
     for(auto particle : particles)
     {
-        Vec2 wind = Vec2(0.3 * PIXELS_PER_METER, 0.1 * PIXELS_PER_METER);
-        particle->AddForce(wind);
-    }
-
-    for(auto particle : particles)
-    {
+        if(particle->position.y < liquid.y){
+            Vec2 wind = Vec2(0.3 * PIXELS_PER_METER, 0.1 * PIXELS_PER_METER);
+            particle->AddForce(wind);
+        }
+        
         Vec2 weight = Vec2(0.0, particle-> mass * 9.8 * PIXELS_PER_METER);
         particle->AddForce(weight);
+
+        //Apply a friction force
+        Vec2 friction = Force::GenerateFrictionForce(*particle, 10.0 * PIXELS_PER_METER);
+        particle->AddForce(friction);
+        
+
+        particle->AddForce(pushForce);
+
+        // Apply a drag force if we are inside the liquid
+        if(particle->position.y >= liquid.y){
+            Vec2 drag = Force::GenerateDragForce(*particle, 0.04);
+            particle->AddForce(drag);
+        }
     }
 
+    //Integrate the acceleration and velocity to estimate the new position
     for(auto particle : particles)
     {
-       particle->AddForce(pushForce);
+        particle->Integrate(deltaTime);
     }
     
     
+    //Check the boundaries of the window
     for(auto particle : particles)
     {
-         particle->Integrate(deltaTime);
-
+        //Hardcoded flip in velocity if it touched the limits of the screen window
         if(particle->position.x + particle->radius / 2 > Graphics::Width())
         {
             particle->position.x =   Graphics::Width() - particle->radius / 2;
@@ -168,3 +198,4 @@ void Application::Destroy() {
     }
     Graphics::CloseWindow();
 }
+ 
