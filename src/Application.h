@@ -11,9 +11,16 @@ class Application {
         std::vector<Particle*> particles;
         Vec2 pushForce = Vec2(0,0);
 
-        // TODO : create a fluid
+        //Drag and Release to create impulse force
+        Vec2 mouseCursor = Vec2(0,0);
+        Vec2 startMouseCursor = Vec2(0,0);
+        bool leftMouseButtonDown = false;
+        
 
-        SDL_Rect liquid;
+
+        // // TODO : create a fluid
+        // SDL_Rect liquid;
+
 
 
     public:
