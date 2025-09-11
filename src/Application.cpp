@@ -2,6 +2,7 @@
 #include "Physics/Constants.h"
 #include "Physics/Force.h"
 
+
 bool Application::IsRunning() {
     return running;
 }
@@ -12,20 +13,13 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();
     
-    // Particle* smallBall = new Particle(50, 100, 1.0);
-    // smallBall->radius = 4;
-    // particles.push_back(smallBall);
+     Particle* smallPlanet = new Particle(200, 200, 1.0);
+     smallPlanet->radius = 6;
+     particles.push_back(smallPlanet);
 
-    Particle* bigBall = new Particle(70,100, 3.0);
-    bigBall->radius = 12;
-    particles.push_back(bigBall);
-
-    //Liquid Surface Creation
-    // liquid.x = 0;
-    // liquid.y = Graphics::Height() / 2;
-    // liquid.w = Graphics::Width();
-    // liquid.h = Graphics::Height() / 2;
-
+    Particle* bigPlanet = new Particle(500,500, 21.0);
+    bigPlanet->radius = 20;
+    particles.push_back(bigPlanet);
 
 }
 
@@ -47,11 +41,7 @@ void Application::Input() {
             case SDL_QUIT:
                 running = false;
                 break;
-            // case SDL_MOUSEBUTTONDOWN:{
-            //     int x, y;
-            //     SDL_GetMouseState(&x, &y); //Get Current mouse Position
-            //     SpawnParticle(x, y, 1.0f, 4.0f);
-            // }
+    
             case SDL_MOUSEMOTION:
                 mouseCursor.x = event.motion.x;
                 mouseCursor.y = event.motion.y;
@@ -139,12 +129,19 @@ void Application::Update() {
     {
 
         particle->AddForce(pushForce);
+
         //Apply a friction force
-        Vec2 friction = Force::GenerateFrictionForce(*particle, 10.0 * PIXELS_PER_METER);
+        Vec2 friction = Force::GenerateFrictionForce(*particle, 10.0);
         particle->AddForce(friction);
 
        
     }
+
+	//Apply a gravitational force between to our two particles
+	Vec2 attraction = Force::GenerateGravitationalForce(*particles[0], *particles[1], 1000.0, 5, 100);
+	particles[0]->AddForce(attraction);
+	particles[1]->AddForce(-attraction);
+
 
     //Integrate the acceleration and velocity to estimate the new position
     for(auto particle : particles)
@@ -190,10 +187,9 @@ void Application::Update() {
 void Application::Render() {
     Graphics::ClearScreen(0xFF548533);
 
-    for(auto particle : particles)
-    {
-        Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFFFFFFF);
-    }
+    Graphics::DrawFillCircle(particles[0]->position.x, particles[0]->position.y, particles[0]->radius, 0xFFAA1100);
+    Graphics::DrawFillCircle(particles[1]->position.x, particles[1]->position.y, particles[1]->radius, 0xFF00FFAA);
+
     if(leftMouseButtonDown)
     {
         Vec2 direction = mouseCursor - startMouseCursor;
