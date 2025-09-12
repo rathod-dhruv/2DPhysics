@@ -17,10 +17,10 @@ class Application {
         bool leftMouseButtonDown = false;
         
 
-
-        // // TODO : create a fluid
-        // SDL_Rect liquid;
-
+        //Everything is in Pixel...liek 200 pixels rest Length
+        Vec2 anchor = Vec2(0, 0);
+        float k = 100;
+        float restLength = 400;
 
 
     public:
