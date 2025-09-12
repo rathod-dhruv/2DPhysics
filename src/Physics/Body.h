@@ -1,9 +1,11 @@
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#ifndef BODY_H
+#define BODY_H
 
 #include "Vec2.h"
 
-struct Particle {
+struct Body
+
+{
     Vec2 position;
     Vec2 velocity;
     Vec2 acceleration;
@@ -13,11 +15,11 @@ struct Particle {
     float mass;
     float invMass;
 
-    Particle(float x, float y, float mass);
+    Body(float x, float y, float mass);
     void Integrate(float dt);
     void AddForce(const Vec2& force);
     void ClearForces();
-    ~Particle();
+    ~Body();
 };
 
 #endif

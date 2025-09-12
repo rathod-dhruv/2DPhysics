@@ -17,10 +17,10 @@ void Application::Setup() {
 	anchor = Vec2(Graphics::Width() / 2.0, 30);
     
 
-	SpawnParticle(anchor.x, anchor.y, 1.0f, 6.0f);
-	SpawnParticle(anchor.x, anchor.y + restLength, 1.0f, 6.0f);
-	SpawnParticle(anchor.x + restLength, anchor.y, 1.0f, 6.0f);
-	SpawnParticle(anchor.x + restLength, anchor.y + restLength, 1.0f, 6.0f);
+	SpawnBody(anchor.x, anchor.y, 1.0f, 6.0f);
+	SpawnBody(anchor.x, anchor.y + restLength, 1.0f, 6.0f);
+	SpawnBody(anchor.x + restLength, anchor.y, 1.0f, 6.0f);
+	SpawnBody(anchor.x + restLength, anchor.y + restLength, 1.0f, 6.0f);
 
 
 
@@ -28,11 +28,12 @@ void Application::Setup() {
 
 
 
-void Application::SpawnParticle(float x, float y, float mass, float radius)
+void Application::SpawnBody(float x, float y, float mass, float radius)
 {
-    Particle* spawnParticle = new Particle(x,y, mass);
-    spawnParticle->radius = radius;
-    particles.push_back(spawnParticle);
+    Body* spawnBody = new Body(x,y, mass);
+    spawnBody->radius = radius;
+    
+    bodies.push_back(spawnBody);
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Input processing
@@ -61,11 +62,11 @@ void Application::Input() {
             case SDL_MOUSEBUTTONUP:
                 if(leftMouseButtonDown && event.button.button == SDL_BUTTON_LEFT)
                 {
-					int lastParticleIndex = particles.size() - 1;
+					int lastBodyIndex = bodies.size() - 1;
                     leftMouseButtonDown = false;
                     Vec2 endMouseCursor = mouseCursor;
                     Vec2 impulse = endMouseCursor - startMouseCursor;
-                    particles[lastParticleIndex]->AddForce(impulse * -10.0f * PIXELS_PER_METER);
+                    bodies[lastBodyIndex]->AddForce(impulse * -10.0f * PIXELS_PER_METER);
                     
                 }
                 break;
@@ -123,75 +124,75 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
 
-    //apply forces to the particles
-    for(auto particle : particles)
+    //apply forces to the bodies
+    for(auto body : bodies)
     {
-        particle->AddForce(pushForce);
+        body->AddForce(pushForce);
 
         //Apply a drag force
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.009);
-        particle->AddForce(drag);
+        Vec2 drag = Force::GenerateDragForce(*body, 0.009);
+        body->AddForce(drag);
 
 		//Apply weight force
-		Vec2 weight = Vec2(0, 9.8 * particle->mass * PIXELS_PER_METER);
-		particle->AddForce(weight);
+		Vec2 weight = Vec2(0, 9.8 * body->mass * PIXELS_PER_METER);
+		body->AddForce(weight);
  
     }
 
-    for (int i = 0; i < NUM_PARTICLES; i++)
+    for (int i = 0; i < NUM_BODIES; i++)
     {
-        int currParticle = i;
-		int nextParticle = (i + 1) % NUM_PARTICLES;
+        int currBody = i;
+		int nextBody = (i + 1) % NUM_BODIES;
 
-		//Apply spring force between the first and the second particle
-		Vec2 springForce = Force::GenerateSpringForce(*particles[currParticle], *particles[nextParticle], restLength, k);
+		//Apply spring force between the first and the second body
+		Vec2 springForce = Force::GenerateSpringForce(*bodies[currBody], *bodies[nextBody], restLength, k);
 
-		particles[currParticle]->AddForce(springForce);
-		particles[nextParticle]->AddForce(-springForce);   
+		bodies[currBody]->AddForce(springForce);
+		bodies[nextBody]->AddForce(-springForce);   
     }
 
-	Vec2 sf1 = Force::GenerateSpringForce(*particles[0], *particles[2], restLength, k);
-    Vec2 sf2 = Force::GenerateSpringForce(*particles[1], *particles[3], restLength, k);
+	Vec2 sf1 = Force::GenerateSpringForce(*bodies[0], *bodies[2], restLength, k);
+    Vec2 sf2 = Force::GenerateSpringForce(*bodies[1], *bodies[3], restLength, k);
 
-    particles[0]->AddForce(sf1);
-    particles[2]->AddForce(-sf1);
+    bodies[0]->AddForce(sf1);
+    bodies[2]->AddForce(-sf1);
 
-    particles[1]->AddForce(sf2);
-    particles[3]->AddForce(-sf2);
+    bodies[1]->AddForce(sf2);
+    bodies[3]->AddForce(-sf2);
 
    
     //Integrate the acceleration and velocity to estimate the new position
-    for(auto particle : particles)
+    for(auto body : bodies)
     {
-        particle->Integrate(deltaTime);
+        body->Integrate(deltaTime);
     }
     
     
     //Check the boundaries of the window
-    for(auto particle : particles)
+    for(auto body : bodies)
     {
         //Hardcoded flip in velocity if it touched the limits of the screen window
-        if(particle->position.x + particle->radius / 2 > Graphics::Width())
+        if(body->position.x + body->radius / 2 > Graphics::Width())
         {
-            particle->position.x =   Graphics::Width() - particle->radius / 2;
-            particle->velocity.x *= -0.9;
+            body->position.x =   Graphics::Width() - body->radius / 2;
+            body->velocity.x *= -0.9;
         }
-        else if(particle->position.x - particle->radius/2 < 0)
+        else if(body->position.x - body->radius/2 < 0)
         {
-            particle->position.x =   particle->radius / 2;
-            particle->velocity.x *= -0.9;
+            body->position.x =   body->radius / 2;
+            body->velocity.x *= -0.9;
 
         }
         
-        if(particle->position.y + particle->radius/2> Graphics::Height())
+        if(body->position.y + body->radius/2> Graphics::Height())
         {
-            particle->position.y = Graphics::Height() - particle->radius / 2;
-            particle->velocity.y *= -0.9;
+            body->position.y = Graphics::Height() - body->radius / 2;
+            body->velocity.y *= -0.9;
         }
-        else if(particle->position.y - particle->radius/2 < 0)
+        else if(body->position.y - body->radius/2 < 0)
         {
-            particle->position.y = particle->radius / 2;
-            particle->velocity.y *= -0.9;
+            body->position.y = body->radius / 2;
+            body->velocity.y *= -0.9;
         }   
     }
     
@@ -207,24 +208,24 @@ void Application::Render() {
     if(leftMouseButtonDown)
     {
         Vec2 direction = mouseCursor - startMouseCursor;
-        Graphics::DrawLine(particles.back()->position.x, particles.back()->position.y, particles.back()->position.x + direction.x, particles.back()->position.y + direction.y, 0xFFFF0000);
+        Graphics::DrawLine(bodies.back()->position.x, bodies.back()->position.y, bodies.back()->position.x + direction.x, bodies.back()->position.y + direction.y, 0xFFFF0000);
     }
 
 	
-    for (int i = 0; i < NUM_PARTICLES; i++)
+    for (int i = 0; i < NUM_BODIES; i++)
     {
-		int currParticle = i;
-        int nextParticle = (i + 1) % NUM_PARTICLES;
-		Graphics::DrawLine(particles[currParticle]->position.x, particles[currParticle]->position.y, particles[nextParticle]->position.x, particles[nextParticle]->position.y, 0xFFFFFFFF);
+		int currBody = i;
+        int nextBody = (i + 1) % NUM_BODIES;
+		Graphics::DrawLine(bodies[currBody]->position.x, bodies[currBody]->position.y, bodies[nextBody]->position.x, bodies[nextBody]->position.y, 0xFFFFFFFF);
     }
 
-    Graphics::DrawLine(particles[0]->position.x, particles[0]->position.y, particles[2]->position.x, particles[2]->position.y, 0xFFFFFFFF);
-	Graphics::DrawLine(particles[1]->position.x, particles[1]->position.y, particles[3]->position.x, particles[3]->position.y, 0xFFFFFFFF);
+    Graphics::DrawLine(bodies[0]->position.x, bodies[0]->position.y, bodies[2]->position.x, bodies[2]->position.y, 0xFFFFFFFF);
+	Graphics::DrawLine(bodies[1]->position.x, bodies[1]->position.y, bodies[3]->position.x, bodies[3]->position.y, 0xFFFFFFFF);
 
-    for(auto particle:particles)
+    for(auto body:bodies)
     {
         //Draw the bob
-        Graphics::DrawFillCircle(particle->position.x, particle->position.y, particle->radius, 0xFFAAFFFF);
+        Graphics::DrawFillCircle(body->position.x, body->position.y, body->radius, 0xFFAAFFFF);
        
 	}
 
@@ -237,9 +238,9 @@ void Application::Render() {
 // Destroy function to delete objects and close the window
 ///////////////////////////////////////////////////////////////////////////////
 void Application::Destroy() {
-    for(auto particle : particles)
+    for(auto body : bodies)
     {
-        delete particle; 
+        delete body; 
     }
     Graphics::CloseWindow();
 }
