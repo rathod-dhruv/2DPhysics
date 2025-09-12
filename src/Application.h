@@ -19,9 +19,9 @@ class Application {
 
         //Everything is in Pixel...liek 200 pixels rest Length
         Vec2 anchor = Vec2(0, 0);
-        float k = 300;
-        float restLength = 15;
-		const int NUM_PARTICLES = 15;
+        float k = 50;
+        float restLength = 50;
+		const int NUM_PARTICLES = 4;
 
 
     public:
