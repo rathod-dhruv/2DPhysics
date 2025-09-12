@@ -45,14 +45,39 @@ Vec2 Force::GenerateSpringForce(const Particle& particle, Vec2 anchor, float res
     float currentLength = distance.Magnitude();
 
     //Calculate the direction of the spring force (unit vector)
-    Vec2 springDirection = distance.UnitVector() * -1.0;
+    Vec2 springDirection = distance.UnitVector();
 
     //Calculate the magnitude of the spring force using Hooke's Law: F = -k * x
-    float springMagnitude = k * (currentLength - restLength);
+    float springMagnitude = -k * (currentLength - restLength);
 
     //Calculate the final spring force vector
     Vec2 springForce = springDirection * springMagnitude;
     return springForce;
+
+}
+
+
+Vec2 Force::GenerateSpringForce(const Particle& a, const Particle& b, float restLength, float k)
+{
+	//Calculate the current distance vector between the two particles
+	Vec2 d = a.position - b.position;
+
+	//Calculate the displacement from the rest length
+	float displacement = d.Magnitude() - restLength;
+
+	//Calculate the direction of the spring force (unit vector)
+
+    Vec2 springDirection = d.UnitVector();
+
+	//Calculate the magnitude of the spring force using Hooke's Law: F = -k * x
+    float springForceMagntiude = -k * displacement;
+
+	//Calculate the final spring force vector
+
+	Vec2 springForce = springDirection * springForceMagntiude;
+
+    return springForce;
+
 
 }
 
