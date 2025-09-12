@@ -17,10 +17,10 @@ void Application::Setup() {
 	anchor = Vec2(Graphics::Width() / 2.0, 30);
     
 
-	SpawnParticle(anchor.x, anchor.y, 2.0f, 10.0f);
-	SpawnParticle(anchor.x, anchor.y + restLength, 2.0f, 10.0f);
-	SpawnParticle(anchor.x + restLength, anchor.y, 2.0f, 10.0f);
-	SpawnParticle(anchor.x + restLength, anchor.y + restLength, 2.0f, 10.0f);
+	SpawnParticle(anchor.x, anchor.y, 1.0f, 6.0f);
+	SpawnParticle(anchor.x, anchor.y + restLength, 1.0f, 6.0f);
+	SpawnParticle(anchor.x + restLength, anchor.y, 1.0f, 6.0f);
+	SpawnParticle(anchor.x + restLength, anchor.y + restLength, 1.0f, 6.0f);
 
 
 
@@ -129,7 +129,7 @@ void Application::Update() {
         particle->AddForce(pushForce);
 
         //Apply a drag force
-        Vec2 drag = Force::GenerateDragForce(*particle, 0.002);
+        Vec2 drag = Force::GenerateDragForce(*particle, 0.009);
         particle->AddForce(drag);
 
 		//Apply weight force
