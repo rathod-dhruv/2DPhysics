@@ -15,3 +15,11 @@ int main(int argc, char *args[]) {
 
     return 0;
 }
+
+
+//OPEN MSYS2 MINGW64 TERMINAL
+//Run this command to compile the project:
+//g++ -std=c++17 -Wall src/*.cpp src/Physics/*.cpp -o app $(pkg-config --cflags --libs sdl2 SDL2_ige SDL2_gfx)
+//Then run the executable:
+//./app.exe
+
