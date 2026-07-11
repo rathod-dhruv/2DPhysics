@@ -2,6 +2,12 @@
 
 A cross-platform 2D physics engine built with C++ and SDL2 that simulates realistic physics interactions including springs, gravity, drag forces, and collision response. The engine features an interactive simulation where users can apply impulse forces through mouse interaction and observe connected particles behave under various physical forces.
 
+## Demo
+
+![2D Physics Simulation](https://github.com/rathod-dhruv/2DPhysics/raw/main/demo.gif)
+
+*Interactive spring-connected particles responding to gravity, drag, and user-applied forces in real-time*
+
 ## Overview
 
 This project demonstrates fundamental physics simulation concepts by implementing a particle-based physics engine with multiple force generators. The simulation visualizes four connected particles arranged in a square grid, connected by springs that respond to stretching and compression. Users can interact with the simulation by dragging particles to apply impulses and watching the system respond in real-time.
