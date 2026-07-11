@@ -5,8 +5,6 @@ A cross-platform 2D physics engine built with C++ and SDL2 that simulates realis
 ## Demo
 <img width="800" height="450" alt="softbody" src="https://github.com/user-attachments/assets/371a83ed-3e1d-48c6-bcd2-53aa7a13f4bc" />
 
-![2D Physics Simulation](https://github.com/rathod-dhruv/2DPhysics/raw/main/demo.gif)
-
 *Interactive spring-connected particles responding to gravity, drag, and user-applied forces in real-time*
 
 ## Overview
