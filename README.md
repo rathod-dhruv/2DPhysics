@@ -29,7 +29,6 @@ This project demonstrates fundamental physics simulation concepts by implementin
 - **Physics:** Custom vector math (Vec2) and force calculations
 
 ## Project Structure
-
 ```
 src/
   Main.cpp              Application entry point, main loop
